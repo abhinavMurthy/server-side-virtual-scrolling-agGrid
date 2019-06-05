@@ -28,3 +28,9 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 
 ## Integrate express server to implement server side row model
+
+Clone the project
+Run npm i
+Run npm run app:express
+
+
