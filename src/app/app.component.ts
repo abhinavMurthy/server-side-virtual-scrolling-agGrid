@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -6,19 +6,73 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  title = 'app';
+export class AppComponent {
+  private gridApi;
+  private gridColumnApi;
 
-    columnDefs = [
-        {headerName: 'Make', field: 'make', sortable: true, filter: true },
-        {headerName: 'Model', field: 'model', sortable: true, filter: true },
-        {headerName: 'Price', field: 'price', sortable: true, filter: true}
+  private columnDefs;
+  private defaultColDef;
+  private rowModelType;
+  private cacheBlockSize;
+  private maxBlocksInCache;
+  private rowData: Array<object>;
+
+  constructor(private http: HttpClient) {
+    this.columnDefs = [
+      { field: "id" },
+      {
+        field: "athlete",
+        width: 150
+      },
+      { field: "age" },
+      { field: "country" },
+      { field: "year" },
+      { field: "sport" },
+      { field: "gold" },
+      { field: "silver" },
+      { field: "bronze" }
     ];
+    this.defaultColDef = {
+      width: 120,
+      resizable: true
+    };
+    this.rowModelType = "serverSide";
+    this.cacheBlockSize = 100;
+    this.maxBlocksInCache = 10;
+  }
 
-   rowData: any;
-   constructor(private http: HttpClient) {}
-   
-   ngOnInit() {
-     this.rowData = this.http.get('./assets/testData_258.json')
-   }
+  onGridReady(params) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+
+    /*this.http
+      .get("/getPaginatedData")
+      .subscribe((data: any) => {
+        var idSequence = 0;
+        data.forEach(function(item) {
+          item.id = idSequence++;
+        });*/
+    //var datasource = new ServerSideDatasource();
+    //params.api.setServerSideDatasource(datasource);
+  
+}
+
+  /*public ServerSideDatasource() {
+  return {
+    getRows(params) {
+      console.log('params.request', params.request);
+      console.log('params', params);
+      this.http.get(`/getPaginatedData?startRow={params.request.startRow}&endRow={params.request.endRow}`).subscribe((response) => {
+        params.successCallback(response.rows, response.lastRow);
+      },
+        () => {
+
+          params.failCallback();
+        })
+    }
+
+
+  }
+};*/
+
 }
