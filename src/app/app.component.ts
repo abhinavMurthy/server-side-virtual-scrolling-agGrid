@@ -52,27 +52,25 @@ export class AppComponent {
         data.forEach(function(item) {
           item.id = idSequence++;
         });*/
-    //var datasource = new ServerSideDatasource();
-    //params.api.setServerSideDatasource(datasource);
-  
-}
-
-  /*public ServerSideDatasource() {
-  return {
-    getRows(params) {
-      console.log('params.request', params.request);
-      console.log('params', params);
-      this.http.get(`/getPaginatedData?startRow={params.request.startRow}&endRow={params.request.endRow}`).subscribe((response) => {
-        params.successCallback(response.rows, response.lastRow);
-      },
-        () => {
-
-          params.failCallback();
-        })
-    }
-
+    var datasource = this.serverSideDatasource();
+    params.api.setServerSideDatasource(datasource);
 
   }
-};*/
 
+  public serverSideDatasource() {
+    return {
+      getRows(params) {
+        console.log('params.request', params.request);
+        console.log('params', params);
+        console.log('request url->', `/getPaginatedData?startRow=${params.request.startRow}&endRow=${params.request.endRow}`)
+        this.http.get(`/getPaginatedData?startRow=${params.request.startRow}&endRow=${params.request.endRow}`).subscribe(
+          (response) => {
+            params.successCallback(response.rows, response.lastRow);
+          },
+          (error) => {
+            params.failCallback();
+          });
+      }
+    }
+  };
 }
