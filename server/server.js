@@ -4,29 +4,32 @@ const fs = require('fs');
 var path = require('path');
 
 const port = 3100;
-let databaseObj;
-fs.readFile('data/transactions.json', (err, data) => {
-    if (err) throw err;
+/**
+ * Mongo Database Connection
+ */
+var MongoClient = require('mongodb').MongoClient
 
-    databaseObj = JSON.parse(data);
+MongoClient.connect('mongodb://localhost:27017', function(err, client) {
+  if (err) throw err
 
+  var db = client.db('bank_example')
 
-    app.get('/getPaginatedData', (request, response) => {
-        var startRow = request.param('startRow');
-        var endRow = request.param('endRow');
-        console.log("startRow=>",startRow);
-        console.log("endRow=>",endRow);
+  app.get('/transactions', (request, response) => {
+    var startRow = parseInt(request.param('startRow'));
+    var endRow = parseInt(request.param('endRow'));
 
-        var rowsThisPage = databaseObj.slice(startRow, endRow);
-        var lastRow = databaseObj.length <= endRow ? databaseObj.length : -1;
-        return response.send({
-            success: true,
-            rows: rowsThisPage,
-            lastRow: lastRow
-        });
+    db.collection('transactions').find().skip(startRow).limit(endRow).toArray(function(err, result) {
+
+      const length = db.collection('transactions').count();
+      var lastRow = length <= endRow ? length : -1;
+      return response.send({
+        success: true,
+        rows: result,
+        lastRow: lastRow
+      });
     })
+  });
+
+  app.use('/', express.static(path.join(__dirname, './dist/my-workspace')));
+  app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 });
-app.use('/', express.static(path.join(__dirname, '../dist/my-workspace')))
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
-
