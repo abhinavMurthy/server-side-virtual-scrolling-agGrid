@@ -2,23 +2,8 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GridApi, ColumnApi } from 'ag-grid-community';
 
+import { TransactionEntity } from '../../models/transaction.entity';
 
-export interface TransactionData {
-  accountStatementLineEntityId: string;
-  bookingDate: string;
-  valueDate: string;
-  paymentPurpose: string;
-  gvc: string;
-  gvcText: string;
-  amount: number;
-  currency: string;
-  transactionState: string;
-  preBookedAccountStatement: Boolean;
-  iban: string;
-  accountName: string;
-  bankIcon: string;
-  bankIconMobile: string;
-}
 
 @Component({
   selector: 'app-transaction-list',
@@ -33,9 +18,12 @@ export class TransactionListComponent {
   private rowModelType: string;
   private cacheBlockSize: number;
   private maxBlocksInCache: number;
-  private rowData: Array<TransactionData>;
+  private rowData: Array<TransactionEntity>;
 
   constructor(private http: HttpClient) {
+    /**
+     * Refactor to service check the the web for best pratcies
+     */
     this.columnDefs = [
       { field: 'accountStatementLineEntityId', sort: 'desc' },
       { field: 'bookingDate' },
@@ -72,6 +60,9 @@ export class TransactionListComponent {
 
         const sortColName = params.request.sortModel[0] ? params.request.sortModel[0].colId : undefined;
         const colFilter = `&sortColumnName=${sortColName}`;
+        /**
+         * Refactor to service
+         */
         this.http.get(
           `/transactions?` +
           `startRow=${params.request.startRow}&` +
