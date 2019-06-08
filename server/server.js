@@ -5,14 +5,8 @@ var path = require('path');
 
 const port = 3100;
 let databaseObj;
-fs.readFile('transactions.json', (err, data) => {
+fs.readFile('data/transactions.json', (err, data) => {
     if (err) throw err;
-
-    /*var idSequence = 0;
-
-    data.forEach(function (item) {
-        item.id = idSequence++;
-    });*/
 
     databaseObj = JSON.parse(data);
 
@@ -32,8 +26,7 @@ fs.readFile('transactions.json', (err, data) => {
         });
     })
 });
-// yay!
-app.use('/', express.static(path.join(__dirname, './dist/my-workspace')))
+app.use('/', express.static(path.join(__dirname, '../dist/my-workspace')))
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
