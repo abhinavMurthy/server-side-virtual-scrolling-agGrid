@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import 'ag-grid-enterprise';
 
 @Component({
   selector: 'app-root',
@@ -18,26 +19,26 @@ export class AppComponent {
   private rowData: Array<object>;
 
   constructor(private http: HttpClient) {
+
+    // this.serverSideDatasource.bind(this);
+ 
     this.columnDefs = [
-      { field: "id" },
-      {
-        field: "athlete",
-        width: 150
-      },
-      { field: "age" },
-      { field: "country" },
-      { field: "year" },
-      { field: "sport" },
-      { field: "gold" },
-      { field: "silver" },
-      { field: "bronze" }
+      { field: "accountStatementLineEntityId" },
+      { field: "bookingDate"},
+      { field: "valueDate" },
+      { field: "paymentPurpose", width: 200 },
+      { field: "amount" },
+      { field: "currency" },
+      { field: "iban" },
+      { field: "accountName" }
     ];
     this.defaultColDef = {
       width: 120,
-      resizable: true
+      resizable: true,
+      sortable: true
     };
     this.rowModelType = "serverSide";
-    this.cacheBlockSize = 100;
+    this.cacheBlockSize = 10;
     this.maxBlocksInCache = 10;
   }
 
@@ -58,13 +59,16 @@ export class AppComponent {
   }
 
   public serverSideDatasource() {
+
+    // const _httpClient = this.http;
     return {
-      getRows(params) {
+      getRows: (params) => {
         console.log('params.request', params.request);
         console.log('params', params);
         console.log('request url->', `/getPaginatedData?startRow=${params.request.startRow}&endRow=${params.request.endRow}`)
+        console.log(params.request.sortModel);
         this.http.get(`/getPaginatedData?startRow=${params.request.startRow}&endRow=${params.request.endRow}`).subscribe(
-          (response) => {
+          (response: any) => {
             params.successCallback(response.rows, response.lastRow);
           },
           (error) => {

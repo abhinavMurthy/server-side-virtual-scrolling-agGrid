@@ -5,7 +5,7 @@ var path = require('path');
 
 const port = 3100;
 let databaseObj;
-fs.readFile('testData.json', (err, data) => {
+fs.readFile('transactions.json', (err, data) => {
     if (err) throw err;
 
     /*var idSequence = 0;
