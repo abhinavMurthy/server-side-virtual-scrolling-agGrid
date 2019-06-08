@@ -9,7 +9,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "app:express": "npm run build && node server.js"
+    "app:express": "npm run build && node server.js",
+    "server": "node server/server.js"
   },
   "private": true,
   "dependencies": {
