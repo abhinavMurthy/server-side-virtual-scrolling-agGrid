@@ -1,24 +1,23 @@
 import { Component } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
-import { GridApi, ColumnApi } from 'ag-grid-community'
+import { GridApi, ColumnApi } from 'ag-grid-community';
 
 
 export interface TransactionData {
-  accountStatementLineEntityId: string,
-  bookingDate: string,
-  valueDate: string,
-  paymentPurpose: string,
-  gvc: string,
-  gvcText: string,
-  amount: number,
-  currency: string,
-  transactionState: string,
-  preBookedAccountStatement: Boolean,
-  iban: string,
-  accountName: string,
-  bankIcon: string,
-  bankIconMobile: string
+  accountStatementLineEntityId: string;
+  bookingDate: string;
+  valueDate: string;
+  paymentPurpose: string;
+  gvc: string;
+  gvcText: string;
+  amount: number;
+  currency: string;
+  transactionState: string;
+  preBookedAccountStatement: Boolean;
+  iban: string;
+  accountName: string;
+  bankIcon: string;
+  bankIconMobile: string;
 }
 
 @Component({
@@ -38,7 +37,7 @@ export class TransactionListComponent {
 
   constructor(private http: HttpClient) {
     this.columnDefs = [
-      { field: 'accountStatementLineEntityId', sort: "desc" },
+      { field: 'accountStatementLineEntityId', sort: 'desc' },
       { field: 'bookingDate' },
       { field: 'valueDate' },
       { field: 'paymentPurpose', width: 400 },
@@ -64,20 +63,26 @@ export class TransactionListComponent {
     params.api.setServerSideDatasource(datasource);
   }
 
-  public serverSideDatasource() {
+  /**
+   * Some comment to describe this method
+   */
+  public serverSideDatasource(): any {
     return {
-      getRows: (params) => {
-        console.log('params.request', params.request);
-        console.log('params', params);
-        console.log('request url->', `/getPaginatedData?startRow=${params.request.startRow}&endRow=${params.request.endRow}&sortColumnName=${params.request.sortModel[0].colId}&sortOrder=${params.request.sortModel[0].sort}`);
-        console.log(params.request.sortModel);
-        this.http.get(`/getPaginatedData?startRow=${params.request.startRow}&endRow=${params.request.endRow}&sortColumnName=${params.request.sortModel[0].colId}&sortOrder=${params.request.sortModel[0].sort}`).subscribe(
-          (response: any) => {
-            params.successCallback(response.rows, response.lastRow);
-          },
-          (error) => {
-            params.failCallback();
-          });
+      getRows: (params: any) => {
+
+        const sortColName = params.request.sortModel[0] ? params.request.sortModel[0].colId : undefined;
+        const colFilter = `&sortColumnName=${sortColName}`;
+        this.http.get(
+          `/transactions?` +
+          `startRow=${params.request.startRow}&` +
+          `endRow=${params.request.endRow}${sortColName ? colFilter : ''}&` +
+          `sortOrder=${params.request.sortModel[0] ? params.request.sortModel[0].sort : 'asc'}`).subscribe(
+            (response: any) => {
+              params.successCallback(response.rows, response.lastRow);
+            },
+            (error) => {
+              params.failCallback();
+            });
       }
     };
   }
