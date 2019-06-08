@@ -17,8 +17,22 @@ MongoClient.connect('mongodb://localhost:27017', function(err, client) {
   app.get('/transactions', (request, response) => {
     var startRow = parseInt(request.param('startRow'));
     var endRow = parseInt(request.param('endRow'));
+    var columnName = request.param('sortColumnName');
+    var sortOrder = request.param('sortOrder');
 
-    db.collection('transactions').find().skip(startRow).limit(endRow).toArray(function(err, result) {
+    const sortType = sortOrder === 'desc' ? -1 : 1;
+
+    const sortObject = { [columnName]: sortType};
+
+    /**
+     * Database query
+     */
+    db.collection('transactions')
+      .find({})
+      .sort(sortObject)
+      .skip(startRow)
+      .limit(endRow)
+      .toArray(function(err, result) {
 
       const length = db.collection('transactions').count();
       var lastRow = length <= endRow ? length : -1;
@@ -30,6 +44,6 @@ MongoClient.connect('mongodb://localhost:27017', function(err, client) {
     })
   });
 
-  app.use('/', express.static(path.join(__dirname, './dist/my-workspace')));
+  app.use('/', express.static(path.join(__dirname, '../dist/my-workspace')));
   app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 });
