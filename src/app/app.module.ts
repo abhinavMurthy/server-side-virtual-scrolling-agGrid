@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { AgGridModule } from 'ag-grid-angular';
-import { TransactionListComponent } from './transaction-list/transaction-list.component';
+import { TransactionListComponent } from './components/transaction-list/transaction-list.component';
 
 @NgModule({
   declarations: [
