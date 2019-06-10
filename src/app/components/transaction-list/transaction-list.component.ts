@@ -1,8 +1,18 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { GridApi, ColumnApi } from 'ag-grid-community';
+import {
+  GridApi,
+  ColumnApi,
+  ColDef,
+  ColDefUtil,
+  IServerSideDatasource,
+  IServerSideGetRowsParams,
+  IAfterGuiAttachedParams,
+  GridReadyEvent
+} from 'ag-grid-community';
 
+import { TransactionListService } from './transaction-list.service';
 import { TransactionEntity } from '../../models/transaction.entity';
+import { TransactionRequest } from '../../models/transaction-request.entity';
 
 
 @Component({
@@ -13,17 +23,14 @@ export class TransactionListComponent {
   private gridApi: GridApi;
   private gridColumnApi: ColumnApi;
 
-  private columnDefs;
-  private defaultColDef;
+  private columnDefs: Array<ColDef>;
+  private defaultColDef: ColDef;
   private rowModelType: string;
   private cacheBlockSize: number;
   private maxBlocksInCache: number;
   private rowData: Array<TransactionEntity>;
 
-  constructor(private http: HttpClient) {
-    /**
-     * Refactor to service check the the web for best pratcies
-     */
+  constructor(private transactionListService: TransactionListService) {
     this.columnDefs = [
       { field: 'accountStatementLineEntityId', sort: 'desc' },
       { field: 'bookingDate' },
@@ -43,37 +50,41 @@ export class TransactionListComponent {
     this.cacheBlockSize = 10;
     this.maxBlocksInCache = 10;
   }
-
-  onGridReady(params) {
+  /**
+   * @param params is of type GridReadyEvent
+   * @returns void
+   * @description this method prepares the datasource and
+   * and is binded to gridReady event of ag-grid.
+   */
+  onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
-    const datasource = this.serverSideDatasource();
+    const datasource: IServerSideDatasource = this.serverSideDatasource();
     params.api.setServerSideDatasource(datasource);
   }
-
   /**
-   * Some comment to describe this method
+   * @returns IServerSideDatasource
+   * @description this method prepares the payloads, makes http call and
+   * returns datasource.
    */
-  public serverSideDatasource(): any {
+  public serverSideDatasource(): IServerSideDatasource {
     return {
-      getRows: (params: any) => {
+      getRows: (params: IServerSideGetRowsParams) => {
+        const requestObj: TransactionRequest = {
+          startRow: params.request.startRow,
+          endRow: params.request.endRow,
+          sortColumnName: params.request.sortModel[0] ? params.request.sortModel[0].colId : undefined,
+          sortOrder: params.request.sortModel[0] ? params.request.sortModel[0].sort : 'asc'
+        };
 
-        const sortColName = params.request.sortModel[0] ? params.request.sortModel[0].colId : undefined;
-        const colFilter = `&sortColumnName=${sortColName}`;
-        /**
-         * Refactor to service
-         */
-        this.http.get(
-          `/transactions?` +
-          `startRow=${params.request.startRow}&` +
-          `endRow=${params.request.endRow}${sortColName ? colFilter : ''}&` +
-          `sortOrder=${params.request.sortModel[0] ? params.request.sortModel[0].sort : 'asc'}`).subscribe(
-            (response: any) => {
-              params.successCallback(response.rows, response.lastRow);
-            },
-            (error) => {
-              params.failCallback();
-            });
+        // service call for transaction list
+        this.transactionListService.getTransactions(requestObj).subscribe(
+          (response: any) => {
+            params.successCallback(response.rows, response.lastRow);
+          },
+          (error) => {
+            params.failCallback();
+          });
       }
     };
   }
