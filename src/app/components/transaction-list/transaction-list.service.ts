@@ -24,6 +24,7 @@ export class TransactionListService {
       `startRow=${requestParams.startRow}&` +
       `endRow=${requestParams.endRow}&` +
       `sortColumnName=${requestParams.sortColumnName}&` +
-      `sortOrder=${requestParams.sortOrder}`);
+      `sortOrder=${requestParams.sortOrder}&` +
+      `filterModel=${requestParams.filterModel}`);
   }
 }

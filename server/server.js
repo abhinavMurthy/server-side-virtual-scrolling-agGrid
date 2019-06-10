@@ -19,6 +19,9 @@ MongoClient.connect('mongodb://localhost:27017', function(err, client) {
     var endRow = parseInt(request.param('endRow'));
     var columnName = request.param('sortColumnName');
     var sortOrder = request.param('sortOrder');
+    var filterModel = JSON.parse(request.param('filterModel'));
+    
+    // console.log("filterModel inside server js", filterModel);
 
     const sortType = sortOrder === 'desc' ? -1 : 1;
 

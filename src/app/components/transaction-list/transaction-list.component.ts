@@ -35,7 +35,15 @@ export class TransactionListComponent {
       { field: 'accountStatementLineEntityId', sort: 'desc' },
       { field: 'bookingDate' },
       { field: 'valueDate' },
-      { field: 'paymentPurpose', width: 400 },
+      { 
+        field: 'paymentPurpose', 
+        width: 400, 
+        filter: "agTextColumnFilter" ,
+        filterParams: {
+          filterOptions: ["contains", "notContains"],
+          caseSensitive: true,
+        }
+      },
       { field: 'amount' },
       { field: 'currency' },
       { field: 'iban' },
@@ -74,9 +82,10 @@ export class TransactionListComponent {
           startRow: params.request.startRow,
           endRow: params.request.endRow,
           sortColumnName: params.request.sortModel[0] ? params.request.sortModel[0].colId : undefined,
-          sortOrder: params.request.sortModel[0] ? params.request.sortModel[0].sort : 'asc'
+          sortOrder: params.request.sortModel[0] ? params.request.sortModel[0].sort : 'asc',
+          filterModel: JSON.stringify(params.request.filterModel)
         };
-
+        console.log('filter criteria', JSON.stringify(params.request.filterModel));
         // service call for transaction list
         this.transactionListService.getTransactions(requestObj).subscribe(
           (response: any) => {

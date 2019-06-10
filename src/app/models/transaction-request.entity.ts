@@ -3,4 +3,5 @@ export interface TransactionRequest {
     endRow: number;
     sortOrder: string;
     sortColumnName: string;
+    filterModel: Object
 }
