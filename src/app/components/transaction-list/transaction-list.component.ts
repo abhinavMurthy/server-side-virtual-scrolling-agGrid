@@ -3,16 +3,15 @@ import {
   GridApi,
   ColumnApi,
   ColDef,
-  ColDefUtil,
   IServerSideDatasource,
   IServerSideGetRowsParams,
-  IAfterGuiAttachedParams,
-  GridReadyEvent
+  GridReadyEvent,
+  IServerSideGetRowsRequest
 } from 'ag-grid-community';
 
 import { TransactionListService } from './transaction-list.service';
 import { TransactionEntity } from '../../models/transaction.entity';
-import { TransactionRequest } from '../../models/transaction-request.entity';
+import { IServerSideGetRowsResponse } from '../../models/server-side-get-rows-response';
 
 
 @Component({
@@ -20,9 +19,9 @@ import { TransactionRequest } from '../../models/transaction-request.entity';
   templateUrl: './transaction-list.component.html'
 })
 export class TransactionListComponent {
+
   private gridApi: GridApi;
   private gridColumnApi: ColumnApi;
-
   private columnDefs: Array<ColDef>;
   private defaultColDef: ColDef;
   private rowModelType: string;
@@ -35,16 +34,17 @@ export class TransactionListComponent {
       { field: 'accountStatementLineEntityId', sort: 'desc' },
       { field: 'bookingDate' },
       { field: 'valueDate' },
-      { 
-        field: 'paymentPurpose', 
-        width: 400, 
-        filter: "agTextColumnFilter" ,
+      {
+        field: 'paymentPurpose',
+        width: 400,
+        filter: 'agTextColumnFilter',
         filterParams: {
-          filterOptions: ["contains", "notContains"],
+          filterOptions: ['contains', 'notContains'],
           caseSensitive: true,
+          newRowsAction : 'keep',
         }
       },
-      { field: 'amount' },
+      { field: 'amount'},
       { field: 'currency' },
       { field: 'iban' },
       { field: 'accountName' }
@@ -78,17 +78,21 @@ export class TransactionListComponent {
   public serverSideDatasource(): IServerSideDatasource {
     return {
       getRows: (params: IServerSideGetRowsParams) => {
-        const requestObj: TransactionRequest = {
+
+        const request: IServerSideGetRowsRequest = {
           startRow: params.request.startRow,
           endRow: params.request.endRow,
-          sortColumnName: params.request.sortModel[0] ? params.request.sortModel[0].colId : undefined,
-          sortOrder: params.request.sortModel[0] ? params.request.sortModel[0].sort : 'asc',
-          filterModel: JSON.stringify(params.request.filterModel)
+          filterModel: params.request.filterModel,
+          sortModel: params.request.sortModel,
+          groupKeys: params.request.groupKeys,
+          valueCols: params.request.pivotCols,
+          pivotCols: params.request.rowGroupCols,
+          rowGroupCols: params.request.rowGroupCols,
+          pivotMode: params.request.pivotMode
         };
-        console.log('filter criteria', JSON.stringify(params.request.filterModel));
-        // service call for transaction list
-        this.transactionListService.getTransactions(requestObj).subscribe(
-          (response: any) => {
+
+        this.transactionListService.getTransactions(request).subscribe(
+          (response: IServerSideGetRowsResponse) => {
             params.successCallback(response.rows, response.lastRow);
           },
           (error) => {

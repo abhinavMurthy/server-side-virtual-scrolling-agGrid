@@ -17,22 +17,22 @@ MongoClient.connect('mongodb://localhost:27017', function(err, client) {
   app.get('/transactions', (request, response) => {
     var startRow = parseInt(request.param('startRow'));
     var endRow = parseInt(request.param('endRow'));
-    var columnName = request.param('sortColumnName');
-    var sortOrder = request.param('sortOrder');
     var filterModel = JSON.parse(request.param('filterModel'));
-    
-    // console.log("filterModel inside server js", filterModel);
+    var sortModel = JSON.parse(request.param('sortModel'));
 
-    const sortType = sortOrder === 'desc' ? -1 : 1;
-
-    const sortObject = { [columnName]: sortType};
+    let keyword;
+    let column;
+    Object.keys(filterModel).forEach( key => {
+      keyword = filterModel[key].filter;
+      column = key;
+    })
 
     /**
-     * Database query
+     * MongoDB database query
      */
     db.collection('transactions')
-      .find({})
-      .sort(sortObject)
+      .find(keyword ? { [column]:  RegExp(keyword) } : {})
+      .sort({ [sortModel[0].colId]: sortModel && sortModel[0].sort === 'desc' ? -1 : 1})
       .skip(startRow)
       .limit(endRow)
       .toArray(function(err, result) {
