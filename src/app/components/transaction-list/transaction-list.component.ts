@@ -11,7 +11,7 @@ import {
 
 import { TransactionListService } from './transaction-list.service';
 import { TransactionEntity } from '../../models/transaction.entity';
-import { IServerSideGetRowsResponse } from '../../models/server-side-get-rows-response';
+import { IServerSideGetRowsResponse } from '../../models/server-side-get-rows.response';
 
 
 @Component({
