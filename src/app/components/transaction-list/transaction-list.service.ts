@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { IServerSideGetRowsRequest } from 'ag-grid-community';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import { TransactionRequest } from '../../models/transaction-request.entity';
-import { TransactionEntity } from '../../models/transaction.entity';
+import { IServerSideGetRowsResponse } from '../../models/server-side-get-rows.response';
 
 @Injectable({
   providedIn: 'root'
@@ -16,14 +16,16 @@ export class TransactionListService {
    * @param requestParams is the request payload object for fetching transaction list
    * @returns Observable
    * @description fetches the list of transactions based on start row, end row
-   * sortColumnName and sort order
+   * sortModel and filterModel
    */
-  getTransactions(requestParams: TransactionRequest): Observable<any> {
+  getTransactions(requestParams: IServerSideGetRowsRequest): Observable<IServerSideGetRowsResponse> {
     return this.http.get(
       `/transactions?` +
       `startRow=${requestParams.startRow}&` +
       `endRow=${requestParams.endRow}&` +
-      `sortColumnName=${requestParams.sortColumnName}&` +
-      `sortOrder=${requestParams.sortOrder}`);
+      `sortModel=${JSON.stringify(requestParams.sortModel)}&` +
+      `filterModel=${JSON.stringify(requestParams.filterModel)}`).pipe(
+        map((response: IServerSideGetRowsResponse) => response)
+      );
   }
 }
